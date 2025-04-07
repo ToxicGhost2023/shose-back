@@ -1,0 +1,32 @@
+{
+  "name": "shose-back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ToxicGhost2023/shose-back.git"
+  },
+  "keywords": [],
+  "author": "ToxicGhsot",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ToxicGhost2023/shose-back/issues"
+  },
+  "homepage": "https://github.com/ToxicGhost2023/shose-back#readme",
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^11.0.1",
+    "@fastify/jwt": "^9.1.0",
+    "@fastify/swagger": "^9.4.2",
+    "@fastify/swagger-ui": "^5.2.2",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.2",
+    "fastify-plugin": "^5.0.1",
+    "mongoose": "^8.13.2"
+  },
+  "type": "module"
+}
