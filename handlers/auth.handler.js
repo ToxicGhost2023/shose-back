@@ -131,7 +131,6 @@ export const logout = async (req, reply) => {
             secure: process.env.NODE_ENV === "production",
             sameSite: "Lax",
         });
-
         reply.send({ message: "Logged out successfully" });
     } catch (error) { }
 };
