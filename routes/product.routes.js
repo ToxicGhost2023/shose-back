@@ -1,6 +1,5 @@
 import { createProduct } from "../handlers/product.handler.js";
 
-
 const createdRoute = {
     schema: {
         tags: ["Products"],
@@ -15,9 +14,28 @@ const createdRoute = {
                 discount: { type: "number" },
                 finalPrice: { type: "number" },
                 image: { type: "string", format: "binary" },
-                category: { type: "string", enum: ["men", "women"] },
+                category: { type: "string", enum: ["مردانه", "زنانه","بچه گانه"] },
+                options: { type: "string", enum: ["رانینگ", "کوه‌نوردی", "فوتبال", "والیبال", "بسکتبال",]  },
+                brand: { type: "string" },
+                color: {
+                    type: "array",
+                    items: { type: "string" },
+                },
+                sizes: {
+                    type: "array",
+                    items: { type: "number" },
+                },
             },
-            required: ["title", "price", "content", "category", "image"],
+            required: [
+                "title",
+                "price",
+                "content",
+                "category",
+                "image",
+                "brand",
+                "color",
+                "sizes"
+            ],
         },
     },
     handler: createProduct,

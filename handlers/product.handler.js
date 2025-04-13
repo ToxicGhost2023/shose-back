@@ -18,6 +18,10 @@ export async function createProduct(req, reply) {
             discount = 0,
             image,
             category,
+            options,
+            brand,
+            color,
+            sizes,
         } = req.body;
 
         if (!image || typeof image !== "string" || !image.startsWith("data:image/")) {
@@ -49,6 +53,10 @@ export async function createProduct(req, reply) {
             finalPrice: Number(finalPrice),
             image: `/uploads/${imageName}`,
             category,
+            options,
+            brand,
+            color,
+            sizes,
         });
 
         await newProduct.save();
