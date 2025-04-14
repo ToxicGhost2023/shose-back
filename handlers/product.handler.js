@@ -72,3 +72,35 @@ export async function createProduct(req, reply) {
         return reply.status(500).send({ message: "خطا در سرور", error: error.message });
     }
 }
+export async function getProducts(req, reply) {
+    try {
+        const products = await ProductsModel.find({}, {
+            createdAt: 0,
+            updatedAt: 0
+        });
+
+        return reply.send({ products });
+    } catch (error) {
+        return reply
+            .code(500)
+            .send({ error: "مشکلی در سرور رخ داده است!" });
+    }
+}
+export async function getProductById(req, reply) {
+    try {
+        const { id } = req.params;
+        const product = await ProductsModel.findById(id, {
+            createdAt: 0,
+            updatedAt: 0,
+        });
+
+        if (!product) {
+            return reply.status(404).send({ message: "محصول یافت نشد" });
+        }
+
+        return reply.send({ product });
+    } catch (error) {
+        console.error("خطا در گرفتن محصول:", error);
+        return reply.status(500).send({ message: "خطا در سرور", error: error.message });
+    }
+}

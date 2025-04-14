@@ -1,4 +1,4 @@
-import { createProduct } from "../handlers/product.handler.js";
+import { createProduct, getProductById, getProducts } from "../handlers/product.handler.js";
 
 const createdRoute = {
     schema: {
@@ -14,8 +14,8 @@ const createdRoute = {
                 discount: { type: "number" },
                 finalPrice: { type: "number" },
                 image: { type: "string", format: "binary" },
-                category: { type: "string", enum: ["مردانه", "زنانه","بچه گانه"] },
-                options: { type: "string", enum: ["رانینگ", "کوه‌نوردی", "فوتبال", "والیبال", "بسکتبال",]  },
+                category: { type: "string", enum: ["مردانه", "زنانه", "کوهنوردی"], },
+                options: { type: "string", enum: ["رانینگ", "کوه‌نوردی", "فوتبال", "والیبال", "بسکتبال",] },
                 brand: { type: "string" },
                 color: {
                     type: "array",
@@ -40,60 +40,60 @@ const createdRoute = {
     },
     handler: createProduct,
 };
-// const productAllRoute = {
-//     schema: {
-//         tags: ["Products"],
-//         summary: "دریافت تمام محصولات",
-//         response: {
-//             202: {
-//                 type: "object",
-//             },
-//         },
-//     },
-//     handler: getProducts,
-// };
+const productAllRoute = {
+    schema: {
+        tags: ["Products"],
+        summary: "دریافت تمام محصولات",
+        response: {
+            202: {
+                type: "object",
+            },
+        },
+    },
+    handler: getProducts,
+};
 
 
-// const productByIdRoute = {
-//     schema: {
-//         tags: ["Products"],
-//         summary: "دریافت جزییات یک محصول",
-//         params: {
-//             type: "object",
-//             properties: {
-//                 id: { type: "string" },
-//             },
-//             required: ["id"],
-//         },
-//         response: {
-//             200: {
-//                 type: "object",
-//                 properties: {
-//                     product: {
-//                         type: "object",
-//                         properties: {
-//                             title: { type: "string" },
-//                             price: { type: "number" },
-//                             quantity: { type: "number" },
-//                             content: { type: "string" },
-//                             discount: { type: "number" },
-//                             finalPrice: { type: "number" },
-//                             image: { type: "string" },
-//                             category: { type: "string" },
-//                         },
-//                     },
-//                 },
-//             },
-//             404: {
-//                 type: "object",
-//                 properties: {
-//                     message: { type: "string" },
-//                 },
-//             },
-//         },
-//     },
-//     handler: getProductById,
-// };
+const productByIdRoute = {
+    schema: {
+        tags: ["Products"],
+        summary: "دریافت جزییات یک محصول",
+        params: {
+            type: "object",
+            properties: {
+                id: { type: "string" },
+            },
+            required: ["id"],
+        },
+        response: {
+            200: {
+                type: "object",
+                properties: {
+                    product: {
+                        type: "object",
+                        properties: {
+                            title: { type: "string" },
+                            price: { type: "number" },
+                            quantity: { type: "number" },
+                            content: { type: "string" },
+                            discount: { type: "number" },
+                            finalPrice: { type: "number" },
+                            image: { type: "string" },
+                            category: { type: "string" },
+                        },
+                    },
+                },
+            },
+            404: {
+                type: "object",
+                properties: {
+                    message: { type: "string" },
+                },
+            },
+        },
+    },
+    handler: getProductById,
+};
 // const likePostRouter = {
 //     schema: {
 //         tags: ["Products"],
@@ -279,8 +279,8 @@ export default function productsRoutes(fastify, options, done) {
     fastify.post("/create", createdRoute);
     // fastify.post("/:id/like", likePostRouter);
     // fastify.get("/:id/like", getLikeRouter);
-    // fastify.get("/getAllProducts", productAllRoute);
-    // fastify.get("/:id", productByIdRoute);
+    fastify.get("/getAllProducts", productAllRoute);
+    fastify.get("/:id", productByIdRoute);
     // fastify.delete("/delete/:id", deleteProductRoute);
     // fastify.put("/updateProduct/:id", updateProductRoute);
     // fastify.patch("/updateQuantity/:id", updateQuantityRoute);
