@@ -21,6 +21,7 @@ import path from "path";
 //---------------------- server
 export const fastify = Fastify({ logger: true });
 import dbConnector from "./config/mongodb.config.js";
+import discountRoutes from "./routes/dicount.routes.js";
 
 
 
@@ -68,6 +69,9 @@ const server = async () => {
     })
     fastify.register(productsRoutes, {
         prefix: "product"
+    })
+    fastify.register(discountRoutes, {
+        prefix: "alldicount"
     })
 
 

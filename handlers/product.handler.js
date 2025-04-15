@@ -104,3 +104,40 @@ export async function getProductById(req, reply) {
         return reply.status(500).send({ message: "خطا در سرور", error: error.message });
     }
 }
+export async function likePost(req, reply) {
+    try {
+        const { id } = req.params;
+        const { liked } = req.body;
+        if (!id) {
+            return reply.code(400).send({ error: "شناسه محصول لازم است" });
+        }
+
+        const product = await ProductsModel.findById(id);
+        if (!product) {
+            return reply.code(404).send({ error: "محصول پیدا نشد" });
+        }
+
+
+        product.likes = liked ? product.likes + 1 : Math.max(0, product.likes - 1);
+        await product.save();
+
+        return reply.code(200).send({
+            liked,
+            likes: product.likes,
+        });
+    } catch (error) {
+        console.error("خطا در لایک کردن:", error);
+        return reply.code(500).send({ error: "خطایی در سرور رخ داد" });
+    }
+}
+export async function getLikepost(req, reply) {
+    try {
+        const { id } = req.params
+        const data = await ProductsModel.findById(id).select("likes");
+        return reply.send({ likes: data.likes });
+    } catch (error) {
+        return reply
+            .code(500)
+            .send({ error: "مشکلی در سرور رخ داده است!" });
+    }
+}

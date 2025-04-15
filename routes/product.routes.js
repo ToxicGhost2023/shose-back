@@ -1,4 +1,4 @@
-import { createProduct, getProductById, getProducts } from "../handlers/product.handler.js";
+import { createProduct, getLikepost, getProductById, getProducts, likePost } from "../handlers/product.handler.js";
 
 const createdRoute = {
     schema: {
@@ -94,69 +94,69 @@ const productByIdRoute = {
     },
     handler: getProductById,
 };
-// const likePostRouter = {
-//     schema: {
-//         tags: ["Products"],
-//         summary: "لایک کردن محصول",
-//         params: {
-//             type: "object",
-//             properties: {
-//                 id: { type: "string" },
-//             },
-//             required: ["id"],
-//         },
-//         response: {
-//             200: {
-//                 type: "object",
-//                 properties: {
-//                     likes: { type: "number" },
-//                 },
-//             },
-//             400: {
-//                 type: "object",
-//                 properties: {
-//                     error: { type: "string" },
-//                 },
-//             },
-//             404: {
-//                 type: "object",
-//                 properties: {
-//                     error: { type: "string" },
-//                 },
-//             },
-//             500: {
-//                 type: "object",
-//                 properties: {
-//                     error: { type: "string" },
-//                 },
-//             },
-//         },
-//     },
-//     handler: likePost,
-// };
+const likePostRouter = {
+    schema: {
+        tags: ["Products"],
+        summary: "لایک کردن محصول",
+        params: {
+            type: "object",
+            properties: {
+                id: { type: "string" },
+            },
+            required: ["id"],
+        },
+        response: {
+            200: {
+                type: "object",
+                properties: {
+                    likes: { type: "number" },
+                },
+            },
+            400: {
+                type: "object",
+                properties: {
+                    error: { type: "string" },
+                },
+            },
+            404: {
+                type: "object",
+                properties: {
+                    error: { type: "string" },
+                },
+            },
+            500: {
+                type: "object",
+                properties: {
+                    error: { type: "string" },
+                },
+            },
+        },
+    },
+    handler: likePost,
+};
 
-// const getLikeRouter = {
-//     schema: {
-//         tags: ["Products"],
-//         summary: "دریافت تمام لایک",
-//         params: {
-//             type: "object",
-//             properties: {
-//                 id: { type: "string" },
-//             },
-//             required: ["id"],
-//         },
-//         response: {
-//             202: {
-//                 type: "object",
-//                 properties: {
-//                     likes: { type: "number" },
-//                 },
-//             },
-//         },
-//     },
-//     handler: getLikepost,
-// };
+const getLikeRouter = {
+    schema: {
+        tags: ["Products"],
+        summary: "دریافت تمام لایک",
+        params: {
+            type: "object",
+            properties: {
+                id: { type: "string" },
+            },
+            required: ["id"],
+        },
+        response: {
+            202: {
+                type: "object",
+                properties: {
+                    likes: { type: "number" },
+                },
+            },
+        },
+    },
+    handler: getLikepost,
+};
 
 
 // const updateProductRoute = {
@@ -277,8 +277,8 @@ const productByIdRoute = {
 
 export default function productsRoutes(fastify, options, done) {
     fastify.post("/create", createdRoute);
-    // fastify.post("/:id/like", likePostRouter);
-    // fastify.get("/:id/like", getLikeRouter);
+    fastify.post("/:id/like", likePostRouter);
+    fastify.get("/:id/like", getLikeRouter);
     fastify.get("/getAllProducts", productAllRoute);
     fastify.get("/:id", productByIdRoute);
     // fastify.delete("/delete/:id", deleteProductRoute);

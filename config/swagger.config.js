@@ -9,6 +9,7 @@ export const fastifySwaggerConfig = {
       { name: "authentication", description: "روت ثبت نام و ورود" },
       { name: "user", description: "user can read & write (profile)" },
       { name: "Products", description: "create product and get product" },
+      { name: "alldicount", description: "create dicount for all products" },
       // { name: "shop", description: "buy product" },
       // { name: "pay", description: "checkout product" },
 
