@@ -141,3 +141,139 @@ export async function getLikepost(req, reply) {
             .send({ error: "مشکلی در سرور رخ داده است!" });
     }
 }
+
+
+
+export async function updateProducts(req, reply) {
+    try {
+        const { id } = req.params;
+        const { image, sizes, color, options, ...updatedData } = req.body;
+
+        console.log("ID:", id);
+        console.log("Updated data:", JSON.stringify(req.body, null, 2));
+
+        // بررسی معتبر بودن ID
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return reply.status(400).send({ message: "آیدی نامعتبر است" });
+        }
+
+        // پردازش تصویر اگر وجود داشته باشد
+        if (image && image.startsWith("data:image/")) {
+            const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+            const buffer = Buffer.from(base64Data, "base64");
+
+            const optimizedImageBuffer = await sharp(buffer)
+                .resize({ width: 800, height: 800, fit: "inside" })
+                .jpeg({ quality: 80 })
+                .toBuffer();
+
+            const imageName = `${uuidv4()}.png`;
+            const uploadPath = join(process.cwd(), "uploads", imageName);
+
+            await fs.mkdir(join(process.cwd(), "uploads"), { recursive: true });
+            await fs.writeFile(uploadPath, optimizedImageBuffer);
+
+            updatedData.image = `/uploads/${imageName}`;
+        } else if (image) {
+            updatedData.image = image; // اگر تصویر به‌صورت URL یا مسیر باشد
+        } else {
+            updatedData.image = updatedData.image || null;
+        }
+
+        // پردازش sizes
+        if (sizes) {
+            updatedData.sizes = Array.isArray(sizes)
+                ? sizes.map(Number).filter((n) => !isNaN(n))
+                : sizes
+                    .split(",")
+                    .map((s) => Number(s.trim()))
+                    .filter((n) => !isNaN(n));
+        }
+
+        // پردازش color
+        if (color) {
+            updatedData.color = Array.isArray(color)
+                ? color.filter((c) => c)
+                : color
+                    .split(",")
+                    .map((c) => c.trim())
+                    .filter((c) => c);
+        }
+
+        // پردازش options
+        if (options) {
+            updatedData.options = Array.isArray(options) ? options : [];
+        }
+
+        // محاسبه قیمت نهایی
+        if (updatedData.price && updatedData.discount !== undefined) {
+            updatedData.finalPrice = updatedData.price - (updatedData.price * (updatedData.discount / 100));
+        }
+
+        // به‌روزرسانی محصول در پایگاه داده
+        const product = await ProductsModel.findByIdAndUpdate(id, updatedData, {
+            new: true,
+            runValidators: true,
+        });
+
+        if (!product) {
+            return reply.status(404).send({ message: "محصول یافت نشد" });
+        }
+
+        return reply.send({ product });
+    } catch (error) {
+        console.error("خطا در آپدیت محصول:", error);
+
+        if (error.name === "ValidationError") {
+            const errors = Object.values(error.errors).map((err) => ({
+                field: err.path,
+                message: err.message,
+            }));
+            return reply.status(400).send({
+                message: "خطا در اعتبارسنجی داده‌ها",
+                errors,
+            });
+        }
+
+        return reply.status(500).send({
+            message: "خطا در سرور",
+            error: error.message,
+        });
+    }
+}
+
+export async function deleteProduct(req, reply) {
+    try {
+        const { id } = req.params;
+
+        // بررسی معتبر بودن ID
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return reply.status(400).send({ message: 'آیدی نامعتبر است' });
+        }
+
+        // پیدا کردن و حذف محصول
+        const product = await ProductsModel.findByIdAndDelete(id);
+
+        if (!product) {
+            return reply.status(404).send({ message: 'محصول یافت نشد' });
+        }
+
+        // حذف تصویر مرتبط اگر وجود دارد
+        if (product.image) {
+            const imagePath = join(process.cwd(), product.image);
+            try {
+                await fs.unlink(imagePath);
+            } catch (error) {
+                console.warn('خطا در حذف تصویر:', error.message);
+            }
+        }
+
+        return reply.send({ message: 'محصول با موفقیت حذف شد' });
+    } catch (error) {
+        console.error('خطا در حذف محصول:', error);
+        return reply.status(500).send({
+            message: 'خطا در سرور',
+            error: error.message,
+        });
+    }
+}

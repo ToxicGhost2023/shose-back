@@ -22,7 +22,7 @@ export const userDetails = async (req, reply) => {
         }
         reply.header("Content-Type", "application/json; charset=utf-8");
 
-        return reply.send(user);
+        return reply.send({ user });
     } catch (error) {
         return reply.status(401).send({ message: "Invalid token" });
     }
