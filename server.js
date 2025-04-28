@@ -31,6 +31,7 @@ export const fastify = Fastify({ logger: true });
 
 // اتصال به دیتابیس
 import dbConnector from "./config/mongodb.config.js";
+import commentsRouter from "./routes/comments.routes.js";
 
 // سرور اصلی
 const server = async () => {
@@ -74,6 +75,7 @@ const server = async () => {
     fastify.register(userRouters, { prefix: "/user" });
     fastify.register(productsRoutes, { prefix: "/product" });
     fastify.register(discountRoutes, { prefix: "/alldicount" });
+    fastify.register(commentsRouter, { prefix: "/comments" });
 
     // شروع سرور
     fastify.listen({ port }, (err, address) => {

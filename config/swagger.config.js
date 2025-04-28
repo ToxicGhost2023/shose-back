@@ -10,6 +10,7 @@ export const fastifySwaggerConfig = {
       { name: "user", description: "user can read & write (profile)" },
       { name: "Products", description: "create product and get product" },
       { name: "alldicount", description: "create dicount for all products" },
+      { name: "Comments", description: "create Comments for all user" },
       // { name: "shop", description: "buy product" },
       // { name: "pay", description: "checkout product" },
 

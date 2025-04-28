@@ -1,19 +1,25 @@
 
-import { UserModel } from "../model/user.model.js"
+
 import { fastify } from "../server.js"
 import { randomInt } from "crypto";
 import dotenv from "dotenv"
+import { UserModel } from "../model/user.model.js";
 dotenv.config()
 
 export const registerHandler = async (req, reply) => {
     try {
-        const { mobile, fullName } = req.body
-        if (!mobile) reply.status(400).send({ error: " شماره موبایل الزامی میباشد" })
-        if (!fullName) reply.status(400).send({ error: "نام ونام خانوادگی موبایل الزامیست" });
-        const user = await UserModel.findOne({ mobile })
+        const { mobile, fullName } = req.body;
+
+        if (!mobile) return reply.status(400).send({ error: "شماره موبایل الزامیست" });
+        if (!fullName) return reply.status(400).send({ error: "نام ونام خانوادگی موبایل الزامیست" });
+
+        let user = await UserModel.findOne({ mobile });
+
         if (user) {
-            reply.Status(400).send(" این حساب قبلا ساخته شده");
+            return reply.send({ error: "این حساب قبلاً وجود دارد", status: 403 });
         }
+
+
         const now = new Date().getTime();
         const otp = {
             code: randomInt(10000, 99999),
@@ -21,23 +27,24 @@ export const registerHandler = async (req, reply) => {
         };
 
         if (!user) {
-            const newUser = await UserModel.create({
+            user = await UserModel.create({
                 mobile,
                 fullName,
                 otp,
-                verifiedMobile: false
-            })
-            return newUser
+                verifiedMobile: false,
+            });
+        } else {
+            return reply.send({ error: "این حساب قبلاً وجود دارد", status: 403 });
         }
 
-        user.otp = otp
-        await user.save()
-        reply.send(otp)
-
+        await user.save();
+        reply.send({ otp: otp.code, message: "کد OTP ارسال شد" });
     } catch (error) {
+        console.error(error);
         reply.status(500).send({ error: "خطای سرور", details: error.message });
     }
-}
+};
+
 export const verifiedOTP = async (req, reply) => {
     try {
         const { otp } = req.body
