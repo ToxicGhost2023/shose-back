@@ -2,7 +2,7 @@ import { applyFestivalDiscount, deactivateFestivalDiscount } from "../handlers/d
 
 const applyDiscountRoute = {
     schema: {
-        tags: ["alldicount"],
+        tags: ["alldiscount"],
         summary: "اعمال تخفیف جشنواره‌ای برای همه محصولات",
         body: {
             type: "object",
@@ -39,7 +39,7 @@ const applyDiscountRoute = {
 
 const deactivateDiscountRoute = {
     schema: {
-        tags: ["alldicount"],
+        tags: ["alldiscount"],
         summary: "غیرفعال کردن تخفیف جشنواره‌ای",
         response: {
             200: {

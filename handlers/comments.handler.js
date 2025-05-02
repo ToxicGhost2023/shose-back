@@ -30,15 +30,3 @@ export const createComment = async (request, reply) => {
         return reply.status(500).send({ message: 'خطا در ارسال نظر', error: error.message });
     }
 };
-export const getCommentById = async (request, reply) => {
-    try {
-        const { id } = request.params;
-        const comment = await Comment.findById(id);
-        if (!comment) {
-            return reply.status(404).send({ message: 'نظر یافت نشد' });
-        }
-        return reply.status(200).send(comment);
-    } catch (error) {
-        return reply.status(500).send({ message: 'خطا در دریافت نظر', error: error.message });
-    }
-};

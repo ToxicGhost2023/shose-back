@@ -1,4 +1,4 @@
-import { createComment, getCommentById, getComments } from "../handlers/comments.handler.js";
+import { createComment, getComments } from "../handlers/comments.handler.js";
 
 
 const createdRoute = {
@@ -24,31 +24,11 @@ const getAllCommentRoute = {
     handler: getComments,
 };
 
-const getCommentByIdRoute = {
-    schema: {
-        tags: ['Comments'],
-        summary: 'دریافت یک نظر خاص',
-        params: {
-            type: 'object',
-            properties: {
-                id: { type: 'string' },
-            },
-            required: ['id'],
-        },
-    },
-    handler: getCommentById,
-};
-
-
-
-
-
-
 
 
 export default function commentsRouter(fastify, options, done) {
     fastify.post("/create", createdRoute);
     fastify.get("/getAllComments", getAllCommentRoute);
-    fastify.get("/:id", getCommentByIdRoute);
+
     done();
 }

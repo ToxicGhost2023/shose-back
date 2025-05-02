@@ -16,7 +16,9 @@ import authRouters from "./routes/auth.routes.js";
 import userRouters from "./routes/user.routes.js";
 import productsRoutes from "./routes/product.routes.js";
 import discountRoutes from "./routes/dicount.routes.js";
-
+import commentsRouter from "./routes/comments.routes.js";
+import shopRoutes from "./routes/store.routes.js";
+import checkOutRoutes from "./routes/checkOut.routes.js";
 // ابزارها
 import path from "path";
 import { join } from 'path';
@@ -31,7 +33,9 @@ export const fastify = Fastify({ logger: true });
 
 // اتصال به دیتابیس
 import dbConnector from "./config/mongodb.config.js";
-import commentsRouter from "./routes/comments.routes.js";
+
+
+
 
 // سرور اصلی
 const server = async () => {
@@ -76,6 +80,8 @@ const server = async () => {
     fastify.register(productsRoutes, { prefix: "/product" });
     fastify.register(discountRoutes, { prefix: "/alldicount" });
     fastify.register(commentsRouter, { prefix: "/comments" });
+    fastify.register(shopRoutes, { prefix: "/shop" });
+    fastify.register(checkOutRoutes, { prefix: "/pay" })
 
     // شروع سرور
     fastify.listen({ port }, (err, address) => {
