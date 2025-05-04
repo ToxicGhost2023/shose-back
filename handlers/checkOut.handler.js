@@ -1,21 +1,40 @@
 import barChartModel from "../model/barChart.model.js";
 import checkOutModel from "../model/checkOut.model.js";
+import ProductsModel from "../model/product.model.js";
 import storeModel from "../model/store.model.js";
+
 
 export async function CheckOut(req, reply) {
     try {
         const { userId, firstName, lastName, phone, address, province, city, postalCode, items } = req.body;
-        if (!userId || !firstName || !lastName || !phone || !address || !province || !city || !postalCode || !items || !Array.isArray(items) || items.length === 0) {
+
+        if (
+            !userId || !firstName || !lastName || !phone || !address || !province ||
+            !city || !postalCode || !items || !Array.isArray(items) || items.length === 0
+        ) {
             return reply.status(400).send({ message: "لطفاً اطلاعات را کامل وارد کنید!" });
         }
+
         const cart = await storeModel.findOne({ userId, status: "active" });
         if (!cart || cart.items.length === 0) {
             return reply.status(400).send({ message: "سبد خرید خالی است" });
         }
-        const totalAmount = items.reduce((sum, item) => {
-            const itemTotal = (item.price || 0) * (item.quantity || 0);
-            return sum + itemTotal;
-        }, 0);
+
+        const enrichedItems = await Promise.all(
+            items.map(async (item) => {
+                const product = await ProductsModel.findById(item.productId).lean();
+                return {
+                    productId: item.productId,
+                    title: product?.title || "نامشخص",
+                    price: item.price,
+                    quantity: item.quantity,
+                    totalPrice: item.price * item.quantity,
+                };
+            })
+        );
+
+        const totalAmount = enrichedItems.reduce((sum, item) => sum + item.totalPrice, 0);
+
         const order = await checkOutModel.create({
             userId,
             firstName,
@@ -25,20 +44,26 @@ export async function CheckOut(req, reply) {
             province,
             city,
             postalCode,
-            items: items.map(item => ({
-                productId: item.productId,
-                price: item.price,
-                quantity: item.quantity,
-                totalPrice: item.price * item.quantity,
-            })),
+            items: enrichedItems,
             totalAmount,
             status: "pending",
         });
 
-
+        // آپدیت بارچارت
         for (const item of items) {
             const { productId, quantity, price, brand } = item;
             const total = quantity * price;
+
+
+            const product = await ProductsModel.findById(productId);
+            if (!product || product.quantity < quantity) {
+                return reply.status(400).send({ message: `موجودی محصول «${product?.title || "نامشخص"}» کافی نیست.` });
+            }
+
+            await ProductsModel.findByIdAndUpdate(productId, {
+
+                $inc: { quantity: -quantity, sold: quantity },
+            });
 
             await barChartModel.findOneAndUpdate(
                 { productId },
@@ -71,7 +96,6 @@ export async function CheckOut(req, reply) {
         reply.status(500).send({ message: "مشکلی در سرور رخ داده است", error: error.message });
     }
 }
-
 // روت مربوط به نمدار پنل ادمین
 export async function getProductForbarChart(req, reply) {
     try {
@@ -163,6 +187,41 @@ export async function updateOrderStatusAsync(req, reply) {
         return reply.code(500).send({ message: "خطا در سرور", error: err.message });
     }
 }
+export async function updateStockAfterSale(req, reply) {
+    try {
+        const { items } = req.body;
+
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return reply.status(400).send({ message: "لیست محصولات ارسال نشده است" });
+        }
+
+        for (const item of items) {
+            const { productId, quantity } = item;
+
+            const product = await ProductsModel.findById(productId);
+            if (!product) {
+                return reply.status(404).send({ message: `محصول با آیدی ${productId} پیدا نشد` });
+            }
+
+            if (product.quantity < quantity) {
+                return reply.status(400).send({
+                    message: `موجودی محصول «${product.title}» کافی نیست. موجودی فعلی: ${product.quantity}`
+                });
+            }
+
+            await ProductsModel.findByIdAndUpdate(productId, {
+                $inc: { quantity: -quantity, sold: quantity },
+            });
+        }
+
+        reply.status(200).send({ message: "موجودی محصولات با موفقیت به‌روزرسانی شد" });
+
+    } catch (error) {
+        console.error(error);
+        reply.status(500).send({ message: "خطا در سرور", error: error.message });
+    }
+}
+
 export async function getCost(req, reply) {
     try {
         const now = new Date();

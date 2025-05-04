@@ -1,4 +1,4 @@
-import { CheckOut, getAllorder, getCost, getProductForbarChart, getRemoveOrderById, updateOrderStatusAsync } from "../handlers/checkOut.handler.js";
+import { CheckOut, getAllorder, getCost, getProductForbarChart, getRemoveOrderById, updateOrderStatusAsync, updateStockAfterSale } from "../handlers/checkOut.handler.js";
 
 
 const checkOutRoute = {
@@ -22,11 +22,12 @@ const checkOutRoute = {
                     minItems: 1,
                     items: {
                         type: "object",
-                        required: ["productId", "price", "quantity"],
+                        required: ["productId", "price", "quantity",],
                         properties: {
                             productId: { type: "string" },
                             price: { type: "number" },
                             quantity: { type: "number" },
+                            title: { type: "string" }
                         },
                     },
                 },
@@ -91,6 +92,7 @@ const orderRoute = {
                                             price: { type: "number" },
                                             quantity: { type: "number" },
                                             totalPrice: { type: "number" },
+                                            title: { type: "string" }
                                         },
                                     },
                                 },
@@ -183,6 +185,54 @@ const updatedOrderRoute = {
     },
     handler: updateOrderStatusAsync,
 };
+
+const stockUpdateRoute = {
+    schema: {
+        tags: ["pay"],
+        summary: "کاهش موجودی محصولات پس از فروش",
+        body: {
+            type: "object",
+            required: ["items"],
+            properties: {
+                items: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        required: ["productId", "quantity"],
+                        properties: {
+                            productId: { type: "string" },
+                            quantity: { type: "number" },
+                        },
+                    },
+                },
+            },
+        },
+        response: {
+            200: {
+                type: "object",
+                properties: {
+                    message: { type: "string" },
+                },
+            },
+            400: {
+                type: "object",
+                properties: {
+                    message: { type: "string" },
+                },
+            },
+            500: {
+                type: "object",
+                properties: {
+                    message: { type: "string" },
+                    error: { type: "string" },
+                },
+            },
+        },
+    },
+    handler: updateStockAfterSale,
+};
+
+
 const deleteOrderRoute = {
     schema: {
         tags: ["pay"],
@@ -279,5 +329,6 @@ export default function checkOutRoutes(fastify, options, done) {
     fastify.delete("/order/:id", deleteOrderRoute);
     fastify.patch("/order/:id", updatedOrderRoute);
     fastify.get("/barChart", barChartRoute);
+    fastify.post("/update-stock", stockUpdateRoute);
     done();
 }

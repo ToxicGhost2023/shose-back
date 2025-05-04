@@ -7,6 +7,7 @@ const ProductsSchema = new Schema(
         category: { type: String, enum: ["مردانه", "زنانه", "کوهنوردی"], required: true },
         options: { type: [String], enum: ["رانینگ", "کوه‌نوردی", "فوتبال", "والیبال", "بسکتبال",] },
         quantity: { type: Number, required: true, min: 1 },
+        sold: { type: Number, default: 0 },
         finalPrice: { type: Number },
         price: { type: Number, required: true },
         discount: { type: Number, default: 0 },

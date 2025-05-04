@@ -1,3 +1,4 @@
+import { type } from "os";
 import { createProduct, deleteProduct, getLikepost, getProductById, getProducts, likePost, updateProducts } from "../handlers/product.handler.js";
 
 const createdRoute = {
@@ -12,6 +13,7 @@ const createdRoute = {
                 quantity: { type: "number" },
                 content: { type: "string" },
                 discount: { type: "number" },
+                sold: { type: "number" },
                 finalPrice: { type: "number" },
                 image: { type: "string", format: "binary" },
                 category: { type: "string", enum: ["مردانه", "زنانه", "کوهنوردی"], },

@@ -16,6 +16,7 @@ const checkOutSchema = new Schema({
     items: [{
         productId: { type: Schema.Types.ObjectId, required: true, ref: "Product" },
         price: { type: Number, required: true },
+        title: { type: String },
         quantity: { type: Number, required: true, min: 1 },
         totalPrice: { type: Number, required: true },
     }],
